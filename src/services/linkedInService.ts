@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const API_KEY = import.meta.env.VITE_API_KEY;
-const LINKEDIN_API_KEY = import.meta.env.VITE_LINKEDIN_API_KEY;
+import api from './api';
 
 export interface LinkedInProfile {
   id: string;
@@ -72,15 +68,7 @@ export interface LinkedInMessage {
   read: boolean;
 }
 
-// Configure axios with the API key
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${API_KEY}`,
-    'X-LinkedIn-API-Key': LINKEDIN_API_KEY
-  }
-});
+
 
 /**
  * LinkedIn Authentication & Connection Management

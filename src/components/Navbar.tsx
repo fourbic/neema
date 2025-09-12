@@ -39,16 +39,16 @@ const Navbar = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem asChild>
-                <Link to="/features/task-management">Task Management</Link>
+                <Link to="/features/ai-safety-mentor">AI Safety Mentor</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/features/smart-notes">Smart Notes</Link>
+                <Link to="/features/secure-communication">Secure Communication</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/features/communication">Communication</Link>
+                <Link to="/features/safe-networking">Safe Networking</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/features/social-media">Social Media</Link>
+                <Link to="/features/community-protection">Community Protection</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

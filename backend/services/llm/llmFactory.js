@@ -5,6 +5,7 @@
 const OpenRouterAdapter = require('./openRouterAdapter');
 const OpenAIAdapter = require('./openAIAdapter');
 const AnthropicAdapter = require('./anthropicAdapter');
+const QwenAdapter = require('./qwenAdapter');
 
 class LLMFactory {
   constructor() {
@@ -12,7 +13,8 @@ class LLMFactory {
     this.adapters = {
       'openrouter': new OpenRouterAdapter(),
       'openai': new OpenAIAdapter(),
-      'anthropic': new AnthropicAdapter()
+      'anthropic': new AnthropicAdapter(),
+      'qwen': new QwenAdapter()
     };
 
     // Set default adapter based on environment variable or fallback to OpenRouter
@@ -36,7 +38,7 @@ class LLMFactory {
   /**
    * Get adapter by provider name
    * 
-   * @param {string} provider Provider name (openrouter, openai, anthropic)
+   * @param {string} provider Provider name (openrouter, openai, anthropic, qwen)
    * @returns {LLMAdapter} The LLM adapter
    */
   getAdapter(provider = null) {

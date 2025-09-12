@@ -29,7 +29,7 @@ export const fetchCalendarEvents = async (startDate?: Date, endDate?: Date): Pro
     }
     
     // Use the configured 'api' instance which includes the auth interceptor
-    const response = await api.get('/api/calendar/events', { params });
+    const response = await api.get('/calendar/events', { params });
     
     // Check response type and handle accordingly
     if (response.headers['content-type']?.includes('application/json')) {
@@ -65,7 +65,7 @@ export const fetchCalendarEvents = async (startDate?: Date, endDate?: Date): Pro
 export const createCalendarEvent = async (event: Omit<CalendarEvent, 'id'>): Promise<CalendarEvent | null> => {
   try {
     // Use the configured 'api' instance
-    const response = await api.post('/api/calendar/events', event);
+    const response = await api.post('/calendar/events', event);
     return response.data;
   } catch (error) {
     console.error('Error creating calendar event:', error);

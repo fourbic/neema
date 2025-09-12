@@ -12,6 +12,12 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// Load Mongoose models
+require('./models/User');
+require('./models/SafetyIncident');
+require('./models/CommunityThreat');
+require('./models/SafetyAuditLog');
+
 // Middleware
 app.use(helmet());
 // Configure CORS

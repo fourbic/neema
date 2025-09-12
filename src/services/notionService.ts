@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const API_KEY = import.meta.env.VITE_API_KEY;
-const NOTION_API_KEY = import.meta.env.VITE_NOTION_API_KEY;
+import api from './api';
 
 export interface NotionPage {
   id: string;
@@ -33,15 +29,7 @@ export interface NotionBlock {
   hasChildren: boolean;
 }
 
-// Configure axios with the API key
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${API_KEY}`,
-    'X-Notion-API-Key': NOTION_API_KEY
-  }
-});
+
 
 // Check if Notion integration is connected
 export const checkNotionConnection = async (userId: string): Promise<boolean> => {

@@ -1,18 +1,6 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const API_KEY = import.meta.env.VITE_API_KEY;
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
-// Configure axios with the API key
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${API_KEY}`,
-    'X-Google-API-Key': GOOGLE_API_KEY
-  }
-});
 
 /**
  * Google Authentication & Connection Management

@@ -20,6 +20,8 @@ const aiRoutes = require('./ai');
 const calendarRoutes = require('./api/calendar'); // Adjusted path based on list_dir
 const notionRoutes = require('./notion');
 const linkedinRoutes = require('./linkedin');
+const syncRoutes = require('./sync');
+const emailRoutes = require('./emails');
 
 // Apply auth middleware and mount routes
 router.use('/productivity', requireAuthAndLoadUser, productivityRoutes);
@@ -35,5 +37,7 @@ router.use('/calendar', requireAuthAndLoadUser, calendarRoutes);
 // Mount integration routes under /integrations path within this router
 router.use('/integrations/notion', requireAuthAndLoadUser, notionRoutes);
 router.use('/integrations/linkedin', requireAuthAndLoadUser, linkedinRoutes);
+router.use('/sync', requireAuthAndLoadUser, syncRoutes);
+router.use('/emails', requireAuthAndLoadUser, emailRoutes);
 
 module.exports = router;

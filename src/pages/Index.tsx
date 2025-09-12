@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, Notebook, Mail, Calendar, Linkedin } from "lucide-react";
+import { ArrowRight, CheckCircle, Shield, Users, Lock, Heart, Sparkles, Globe } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FeatureCard from "@/components/FeatureCard";
@@ -17,15 +17,15 @@ const Index = () => {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-20">
             <div className="flex-1 space-y-8 max-w-2xl">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight animate-fade-in leading-tight">
-                <span>Meet </span>
-                <span className="text-neema-primary">Neema</span>
+                <span>Your Online Navigator </span>
+                <span className="text-neema-primary">Shield</span>
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground max-w-xl animate-slide-up mt-6" style={{animationDelay: '0.2s'}}>
-                Your friendly AI co-pilot for <span className="font-semibold">solo founders, creators, and moonlighters.</span>
+                Built for <span className="font-semibold text-neema-primary">women entrepreneurs and content creators</span> who deserve to work safely online.
               </p>
               
               <p className="text-lg text-gray-600 max-w-xl animate-slide-up" style={{animationDelay: '0.4s'}}>
-                Neema brings together your notes, emails, calendar, and socials into one seamless workflow.
+                Neema protects you from harassment and privacy risks while helping you build your business with confidence.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 pt-6 animate-slide-up" style={{animationDelay: '0.6s'}}>
@@ -53,24 +53,24 @@ const Index = () => {
               </div>
               
               <div className="flex flex-col gap-4 animate-slide-up pt-4" style={{animationDelay: '0.8s'}}>
-                <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">Integrated with your favorite tools</p>
+                <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">Protected integrations</p>
                 <div className="flex flex-wrap gap-6">
                   <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-5 w-5 text-neema-primary" />
-                    <span className="font-medium">Notion</span>
+                    <Shield className="h-5 w-5 text-neema-primary" />
+                    <span className="font-medium">Safe Networking</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-5 w-5 text-neema-primary" />
-                    <span className="font-medium">Email</span>
+                    <Lock className="h-5 w-5 text-neema-primary" />
+                    <span className="font-medium">Encrypted Notes</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-5 w-5 text-neema-primary" />
-                    <span className="font-medium">Calendar</span>
+                    <Heart className="h-5 w-5 text-neema-primary" />
+                    <span className="font-medium">Community Support</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
+                  {/* <div className="flex items-center gap-2 text-sm">
                     <CheckCircle className="h-5 w-5 text-neema-primary" />
                     <span className="font-medium">LinkedIn</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -98,32 +98,32 @@ const Index = () => {
       <section className="py-24 md:py-32 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
           <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">All Your Work in One Place</h2>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">SbD Features for Women Entrepreneurs</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Neema connects your productivity tools to help you focus on what matters most.
+              Every feature is designed with your safety and empowerment in mind, so you can focus on building your business.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FeatureCard 
-              icon={<Notebook className="h-10 w-10 text-neema-primary" />} 
-              title="Task & Project Management" 
-              description="Organize tasks across multiple projects with smart deadlines and reminders based on your calendar context."
+              icon={<Shield className="h-10 w-10 text-neema-primary" />} 
+              title="AI Safety Mentor" 
+              description="Personalized safety guidance that learns your risk patterns and provides tailored protection recommendations."
             />
             <FeatureCard 
-              icon={<Mail className="h-10 w-10 text-neema-primary" />} 
-              title="Smart Notes" 
-              description="Bi-directional sync with Notion, plus AI-powered summarization, tagging, and linking of notes."
+              icon={<Lock className="h-10 w-10 text-neema-primary" />} 
+              title="Secure Comms" 
+              description="End-to-end encrypted notes and messages with threat detection for safe communications."
             />
             <FeatureCard 
-              icon={<Calendar className="h-10 w-10 text-neema-primary" />} 
-              title="Communication Management" 
-              description="Gmail integration for email triage and smart replies, plus scheduling assistance via Google Calendar."
+              icon={<Users className="h-10 w-10 text-neema-primary" />} 
+              title="Safe Networking" 
+              description="Verified connections and risk assessment for LinkedIn interactions with safe meeting recommendations."
             />
             <FeatureCard 
-              icon={<Linkedin className="h-10 w-10 text-neema-primary" />} 
-              title="Social Media Assistant" 
-              description="Draft, schedule, and optimize LinkedIn posts with engagement metrics and suggestions."
+              icon={<Heart className="h-10 w-10 text-neema-primary" />} 
+              title="Community Protection" 
+              description="Anonymous threat intelligence sharing and local support organization integration for collective safety."
             />
           </div>
         </div>
@@ -135,38 +135,38 @@ const Index = () => {
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">How Neema Works</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Your personal AI assistant that keeps everything organized and helps you stay productive.
+              Your AI companion  proactively protects you while helping you build your business with confidence.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="neema-card p-10 bg-white rounded-2xl shadow-sm border border-neema-secondary/10 hover:shadow-md transition-all duration-300">
               <div className="w-16 h-16 rounded-full bg-neema-secondary/30 flex items-center justify-center mb-8">
-                <span className="text-neema-primary font-bold text-2xl">1</span>
+                <Shield className="h-8 w-8 text-neema-primary" />
               </div>
-              <h3 className="text-2xl font-semibold mb-4">Connect Your Tools</h3>
+              <h3 className="text-2xl font-semibold mb-4">Assess Your Safety Profile</h3>
               <p className="text-muted-foreground text-lg">
-                Seamlessly integrate with Notion, Gmail, Google Calendar, and LinkedIn with just a few clicks.
+                Complete a personalized safety assessment to understand your risk tolerance and protection needs.
               </p>
             </div>
             
             <div className="neema-card p-10 bg-white rounded-2xl shadow-sm border border-neema-secondary/10 hover:shadow-md transition-all duration-300">
               <div className="w-16 h-16 rounded-full bg-neema-secondary/30 flex items-center justify-center mb-8">
-                <span className="text-neema-primary font-bold text-2xl">2</span>
+                <Sparkles className="h-8 w-8 text-neema-primary" />
               </div>
-              <h3 className="text-2xl font-semibold mb-4">Customize Your Workflow</h3>
+              <h3 className="text-2xl font-semibold mb-4">Customize Protection</h3>
               <p className="text-muted-foreground text-lg">
-                Set your preferences for daily check-ins, notifications, and how Neema should prioritize your tasks.
+                Get real-time safety guidance, threat detection, and personalized recommendations for safe online interactions.
               </p>
             </div>
             
             <div className="neema-card p-10 bg-white rounded-2xl shadow-sm border border-neema-secondary/10 hover:shadow-md transition-all duration-300">
               <div className="w-16 h-16 rounded-full bg-neema-secondary/30 flex items-center justify-center mb-8">
-                <span className="text-neema-primary font-bold text-2xl">3</span>
+                <Users className="h-8 w-8 text-neema-primary" />
               </div>
-              <h3 className="text-2xl font-semibold mb-4">Let Neema Do the Rest</h3>
+              <h3 className="text-2xl font-semibold mb-4">Community & Support</h3>
               <p className="text-muted-foreground text-lg">
-                Enjoy a daily summary of tasks, important emails, meetings, and smart suggestions to keep you productive.
+                Connect with local support organizations and benefit from collective safety intelligence while maintaining privacy.
               </p>
             </div>
           </div>
@@ -176,9 +176,9 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-24 md:py-32 bg-gradient-to-r from-neema-primary to-neema-primary/80">
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-8 text-white leading-tight">Ready to Boost Your Productivity?</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-8 text-white leading-tight">Ready to Work Safely Online?</h2>
           <p className="text-xl text-white/90 max-w-3xl mx-auto mb-12">
-            Join thousands of solo founders, creators, and moonlighters who use Neema to stay on top of their work and goals.
+            Join women entrepreneurs and content creators in Kenya who are building their businesses with confidence, knowing they're protected by AI-powered safety features.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <SignedOut>

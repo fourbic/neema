@@ -4,6 +4,7 @@ import api from './api';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_KEY = import.meta.env.VITE_API_KEY;
 
+
 export interface Participant {
   id?: string;
   name: string;

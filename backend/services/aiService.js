@@ -3,21 +3,23 @@
  * Handles all AI-related functionality using the LLM adapter system
  */
 const llmFactory = require('./llm/llmFactory');
+const safetyService = require('./safetyService');
+const contentSafetyAnalyzer = require('./contentSafetyAnalyzer');
 
 class AiService {
   constructor() {
     // Set default model preferences for different tasks
     this.modelPreferences = {
       chat: {
-        default: process.env.DEFAULT_CHAT_MODEL || 'anthropic/claude-3-haiku',
+        default: process.env.DEFAULT_CHAT_MODEL || process.env.DEFAULT_QWEN_MODEL || 'anthropic/claude-3-haiku',
         fallback: 'openai/gpt-3.5-turbo',
       },
       productivity: {
-        default: process.env.DEFAULT_PRODUCTIVITY_MODEL || 'anthropic/claude-3-haiku',
+        default: process.env.DEFAULT_PRODUCTIVITY_MODEL || process.env.DEFAULT_QWEN_MODEL || 'anthropic/claude-3-haiku',
         fallback: 'openai/gpt-3.5-turbo',
       },
       summarization: {
-        default: process.env.DEFAULT_SUMMARIZATION_MODEL || 'anthropic/claude-3-haiku',
+        default: process.env.DEFAULT_SUMMARIZATION_MODEL || process.env.DEFAULT_QWEN_MODEL || 'anthropic/claude-3-haiku',
         fallback: 'openai/gpt-3.5-turbo',
       }
     };
@@ -93,22 +95,37 @@ class AiService {
   }
 
   /**
-   * Generate chat response
+   * Generate chat response with safety processing
    * 
    * @param {string} message User message
    * @param {Array} history Chat history
    * @param {Object} context User context
    * @param {string} model Requested model
+   * @param {string} userId User ID for safety analysis
    * @returns {Object} Response containing text or error
    */
-  async generateChatResponse(message, history = [], context = {}, model = null) {
+  async generateChatResponse(message, history = [], context = {}, model = null, userId = null) {
     try {
-      // Format system prompt with context
-      const systemPrompt = `You are Neema, a helpful AI assistant integrated into a productivity dashboard. 
-      Your goal is to assist the user with tasks, scheduling, communication, and insights based on their provided context. 
-      Be concise, helpful, and proactive. 
+      // Analyze user message for safety risks if userId provided
+      let safetyAnalysis = null;
+      if (userId) {
+        safetyAnalysis = await contentSafetyAnalyzer.analyzeContent(
+          userId, 
+          message, 
+          'chat', 
+          { contentId: 'chat_message', userId }
+        );
+      }
+
+      // Format system prompt with context and safety considerations
+      const systemPrompt = `You are Neema, a Safety-First AI assistant for women entrepreneurs and content creators in Kenya. 
+      Your goal is to assist users with tasks, scheduling, communication, and insights while prioritizing their safety and well-being.
+      Always consider safety implications in your responses and provide supportive, empowering guidance.
+      Be concise, helpful, proactive, and culturally aware of Kenyan context.
       Current Date/Time: ${new Date().toISOString()}
-      User Context: ${JSON.stringify(context, null, 2)}`;
+      User Context: ${JSON.stringify(context, null, 2)}
+      ${safetyAnalysis && safetyAnalysis.overallRisk > 0.5 ? 
+        `SAFETY ALERT: User message contains potential risks. Be extra supportive and consider safety implications.` : ''}`;
 
       // Format messages for LLM
       const messages = [
@@ -126,7 +143,22 @@ class AiService {
         temperature: 0.7
       });
 
-      return { response: response.trim() };
+      // Analyze response for safety if userId provided
+      let responseSafetyAnalysis = null;
+      if (userId) {
+        responseSafetyAnalysis = await contentSafetyAnalyzer.analyzeContent(
+          userId, 
+          response, 
+          'ai_response', 
+          { contentId: 'ai_response', userId }
+        );
+      }
+
+      return { 
+        response: response.trim(),
+        safetyAnalysis,
+        responseSafetyAnalysis
+      };
     } catch (error) {
       return this._handleError(error, 'generate chat response');
     }
@@ -492,6 +524,205 @@ Format the response as a JSON object: {"greeting": "...", "focusAreas": ["..."],
     } catch (error) {
       console.error('Error getting provider status:', error);
       return {};
+    }
+  }
+
+  /**
+   * Generate safety guidance for user
+   * 
+   * @param {string} userId User ID
+   * @param {Object} context User context and current activity
+   * @param {string} model Requested model
+   * @returns {Object} Safety guidance or error
+   */
+  async generateSafetyGuidance(userId, context = {}, model = null) {
+    try {
+      const safetyProfile = await safetyService.getSafetyProfile(userId);
+      const relevantThreats = await safetyService.getRelevantThreats(userId, 5);
+      
+      const prompt = `As Neema's AI Safety Mentor, provide personalized safety guidance for a woman entrepreneur in Kenya.
+
+User Safety Profile:
+- Risk Tolerance: ${safetyProfile.riskTolerance}
+- Protection Level: ${safetyProfile.protectionLevel}
+- Vulnerability Factors: ${safetyProfile.vulnerabilityFactors.join(', ')}
+- Cultural Context: ${safetyProfile.culturalContext}
+
+Current Context:
+${JSON.stringify(context, null, 2)}
+
+Relevant Community Threats:
+${relevantThreats.map(threat => `- ${threat.threatCategory}: ${threat.threatDescription}`).join('\n')}
+
+Provide:
+1. Immediate safety actions (if any risks detected)
+2. Preventive measures for the current context
+3. Educational content relevant to their situation
+4. Local support resources in Kenya
+
+Format as JSON:
+{
+  "immediateActions": ["action1", "action2"],
+  "preventiveMeasures": ["measure1", "measure2"],
+  "educationalContent": "brief educational tip",
+  "supportResources": ["resource1", "resource2"]
+}`;
+
+      // Select appropriate adapter
+      const { adapter, modelId } = this._selectAdapter(model, 'chat');
+
+      // Generate response
+      const response = await adapter.chatCompletion([
+        { role: 'system', content: 'You are Neema\'s AI Safety Mentor, providing personalized safety guidance for women entrepreneurs in Kenya.' },
+        { role: 'user', content: prompt }
+      ], { 
+        model: modelId,
+        temperature: 0.3
+      });
+
+      try {
+        const guidance = JSON.parse(response.trim());
+        return { guidance };
+      } catch (parseError) {
+        console.error('AI service error parsing safety guidance:', parseError, 'Raw response:', response);
+        return { error: 'Failed to parse safety guidance from AI response' };
+      }
+    } catch (error) {
+      return this._handleError(error, 'generate safety guidance');
+    }
+  }
+
+  /**
+   * Analyze content for safety before posting
+   * 
+   * @param {string} userId User ID
+   * @param {string} content Content to analyze
+   * @param {string} platform Target platform
+   * @param {Object} context Additional context
+   * @returns {Object} Safety analysis and recommendations
+   */
+  async analyzeContentForSafety(userId, content, platform, context = {}) {
+    try {
+      return await contentSafetyAnalyzer.analyzeContent(userId, content, platform, context);
+    } catch (error) {
+      return this._handleError(error, 'analyze content for safety');
+    }
+  }
+
+  /**
+   * Generate safe alternative content
+   * 
+   * @param {string} userId User ID
+   * @param {string} originalContent Original content
+   * @param {string} platform Target platform
+   * @param {Object} safetyAnalysis Safety analysis results
+   * @param {string} model Requested model
+   * @returns {Object} Safe alternative content or error
+   */
+  async generateSafeAlternative(userId, originalContent, platform, safetyAnalysis, model = null) {
+    try {
+      const prompt = `As Neema's AI Safety Assistant, help create a safe alternative to this content for ${platform}.
+
+Original Content:
+"${originalContent}"
+
+Safety Analysis Results:
+- Harassment Risk: ${safetyAnalysis.risks.harassment.severity}
+- Privacy Risk: ${safetyAnalysis.risks.privacy.severity}
+- Professional Risk: ${safetyAnalysis.risks.professional.severity}
+- Overall Risk: ${safetyAnalysis.overallRisk}
+
+Recommendations:
+${safetyAnalysis.recommendations.map(rec => `- ${rec.message}`).join('\n')}
+
+Create a safe alternative that:
+1. Maintains the original message intent
+2. Removes or mitigates identified risks
+3. Is appropriate for professional networking
+4. Is culturally sensitive for Kenyan context
+5. Empowers the user's business goals
+
+Provide the safe alternative content and explain the changes made.`;
+
+      // Select appropriate adapter
+      const { adapter, modelId } = this._selectAdapter(model, 'chat');
+
+      // Generate response
+      const response = await adapter.chatCompletion([
+        { role: 'system', content: 'You are Neema\'s AI Safety Assistant, helping create safe, professional content for women entrepreneurs.' },
+        { role: 'user', content: prompt }
+      ], { 
+        model: modelId,
+        temperature: 0.4
+      });
+
+      return { 
+        safeAlternative: response.trim(),
+        originalContent,
+        platform,
+        safetyAnalysis
+      };
+    } catch (error) {
+      return this._handleError(error, 'generate safe alternative');
+    }
+  }
+
+  /**
+   * Generate emergency response guidance
+   * 
+   * @param {string} userId User ID
+   * @param {string} emergencyType Type of emergency
+   * @param {Object} context Emergency context
+   * @param {string} model Requested model
+   * @returns {Object} Emergency guidance or error
+   */
+  async generateEmergencyGuidance(userId, emergencyType, context = {}, model = null) {
+    try {
+      const safetyProfile = await safetyService.getSafetyProfile(userId);
+      
+      const prompt = `As Neema's Emergency Response AI, provide immediate guidance for a safety emergency.
+
+Emergency Type: ${emergencyType}
+User Context: ${JSON.stringify(context, null, 2)}
+User Safety Profile: ${safetyProfile.protectionLevel} protection level
+
+Provide immediate guidance including:
+1. Immediate actions to take
+2. Emergency contacts to reach
+3. Documentation steps
+4. Legal considerations for Kenya
+5. Follow-up actions
+
+Format as JSON:
+{
+  "immediateActions": ["action1", "action2"],
+  "emergencyContacts": ["contact1", "contact2"],
+  "documentationSteps": ["step1", "step2"],
+  "legalConsiderations": "brief legal guidance",
+  "followUpActions": ["action1", "action2"]
+}`;
+
+      // Select appropriate adapter
+      const { adapter, modelId } = this._selectAdapter(model, 'chat');
+
+      // Generate response
+      const response = await adapter.chatCompletion([
+        { role: 'system', content: 'You are Neema\'s Emergency Response AI, providing critical safety guidance for women entrepreneurs in Kenya.' },
+        { role: 'user', content: prompt }
+      ], { 
+        model: modelId,
+        temperature: 0.2
+      });
+
+      try {
+        const guidance = JSON.parse(response.trim());
+        return { guidance };
+      } catch (parseError) {
+        console.error('AI service error parsing emergency guidance:', parseError, 'Raw response:', response);
+        return { error: 'Failed to parse emergency guidance from AI response' };
+      }
+    } catch (error) {
+      return this._handleError(error, 'generate emergency guidance');
     }
   }
 }

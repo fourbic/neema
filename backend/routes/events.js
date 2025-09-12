@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
+const { clerkAuth } = require('../middleware/auth');
 const Event = require('../models/Event');
 
 // @route   GET api/events
 // @desc    Get events within date range
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', clerkAuth, async (req, res) => {
   try {
     const events = await Event.find({
       user: req.user.id,

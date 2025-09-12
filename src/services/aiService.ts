@@ -1,43 +1,5 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const API_KEY = import.meta.env.VITE_API_KEY; // Not needed for public test endpoints
-const DEFAULT_MODEL = import.meta.env.VITE_DEFAULT_MODEL || 'meta-llama/llama-4-maverick:free';
-
-interface Message {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-}
-
-interface AIContext {
-  tasks?: any[];
-  emails?: any[];
-  events?: any[];
-  userPreferences?: Record<string, any>;
-  userProfile?: Record<string, any>;
-  [key: string]: any;
-}
-
-export interface LLMModel {
-  id: string;
-  name: string;
-  provider: string;
-  providerId: string;
-}
-
-export interface ProviderStatus {
-  configured: boolean;
-  isDefault: boolean;
-}
-
-// Configure axios (no auth for test endpoints)
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-    // Auth header removed for testing public endpoints
-  }
-});
 
 /**
  * Get available LLM models from the backend

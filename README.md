@@ -1,13 +1,11 @@
 # Welcome to your Neema project
 
-## What is Neema?
 
-Neema is your AI co-pilot for solo founders and creators. It's designed to help you track progress, manage tasks, and stay in flow effortlessly.
+It's designed to help you track progress, manage tasks, and stay in flow effortlessly.
 
 ## Features
 
 *   A cloud-based development environment accessible from any device.
-*   AI coding assistance using Gemini models.
 *   The ability to import existing repos and customize your workspace.
 *   Support for popular frameworks and languages, including (but not limited to!) Go, Java, .NET, Python, Android, Flutter, and web (React, Angular, Vue.js, and more).
 *   Built-in support for emulation, testing, and debugging.

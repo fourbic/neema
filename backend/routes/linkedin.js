@@ -5,7 +5,7 @@ const axios = require('axios');
 // TODO: Ensure these are set in your environment variables
 const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID;
 const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET;
-const LINKEDIN_REDIRECT_URI = process.env.LINKEDIN_REDIRECT_URI; // e.g., 'http://localhost:3000/integrations/linkedin/callback'
+const LINKEDIN_REDIRECT_URI = process.env.LINKEDIN_REDIRECT_URI || 'http://localhost:5050/integrations/linkedin/callback';
 
 // Base URL for LinkedIn API v2 (confirm specific endpoints needed)
 const LINKEDIN_API_BASE = 'https://api.linkedin.com/v2';
@@ -14,7 +14,7 @@ const LINKEDIN_API_BASE = 'https://api.linkedin.com/v2';
 // Assumes user object with linkedinAccessToken is attached via auth middleware
 const getAxiosConfig = (req) => {
   // TODO: Replace with actual logic to get user's LinkedIn access token
-  const accessToken = req.user?.linkedinAccessToken;
+  const accessToken = req.dbUser?.integrations?.linkedin?.accessToken;
   if (!accessToken) {
     console.warn('No LinkedIn access token found for user.');
     throw new Error('LinkedIn token missing'); // Throw error to be caught by route handler
@@ -95,7 +95,24 @@ router.post('/callback', async (req, res) => {
     // TODO: IMPORTANT: Securely store the accessToken (and potentially refresh token) associated with the userId.
     // Calculate expiry time: Date.now() + expiresIn * 1000
     // Example: await UserModel.findByIdAndUpdate(userId, { linkedinAccessToken: accessToken, linkedinTokenExpiry: Date.now() + expiresIn * 1000 });
-    console.log(`User ${userId} connected to LinkedIn.`);
+    // --- Store Token --- 
+    const updatedUser = await User.findOneAndUpdate(
+        { clerkId: userId },
+        {
+            $set: {
+                'integrations.linkedin.connected': true,
+                'integrations.linkedin.accessToken': accessToken,
+                'integrations.linkedin.tokenExpiry': new Date(Date.now() + expiresIn * 1000)
+            }
+        },
+        { new: true }
+    );
+    if (!updatedUser) {
+        console.error(`Failed to find user ${userId} to store LinkedIn token.`);
+        return res.status(404).json({ message: 'User not found while saving LinkedIn connection.' });
+    }
+    console.log(`Stored LinkedIn token for user ${userId}`);
+    // --- End Store Token --- 
 
     res.json({ success: true });
 
@@ -107,24 +124,27 @@ router.post('/callback', async (req, res) => {
 
 // GET /integrations/linkedin/status
 router.get('/status', async (req, res) => {
-  // TODO: Implement logic based on stored token and its expiry
-  // Example: const user = await UserModel.findById(req.query.userId);
-  // const connected = !!user?.linkedinAccessToken && user.linkedinTokenExpiry > Date.now();
-  // res.json({ connected });
-   try {
-        getAxiosConfig(req); // Will throw if no valid token
-        res.json({ connected: true });
-    } catch (error) {
-        res.json({ connected: false }); // Assume not connected if token is missing/invalid
-    }
+  try {
+    const user = req.dbUser; // User is already loaded by middleware
+    const connected = user?.integrations?.linkedin?.connected &&
+                      user.integrations.linkedin.accessToken &&
+                      user.integrations.linkedin.tokenExpiry > new Date();
+    res.json({ connected });
+  } catch (error) {
+    console.error('Error checking LinkedIn status:', error);
+    res.json({ connected: false });
+  }
 });
 
 // POST /integrations/linkedin/disconnect
 router.post('/disconnect', async (req, res) => {
   const { userId } = req.body;
   try {
-    // TODO: Clear the stored LinkedIn token(s) for the user in your database
-    // Example: await UserModel.findByIdAndUpdate(userId, { $unset: { linkedinAccessToken: "", linkedinTokenExpiry: "" } });
+    // Clear the stored LinkedIn token(s) for the user in your database
+    await User.findOneAndUpdate({ clerkId: userId }, {
+        $set: { 'integrations.linkedin.connected': false },
+        $unset: { 'integrations.linkedin.accessToken': '', 'integrations.linkedin.tokenExpiry': '' }
+    });
     console.log(`User ${userId} disconnected from LinkedIn.`);
     // Note: You might also want to make an API call to LinkedIn to revoke the token, if available.
     res.json({ success: true });

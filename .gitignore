@@ -25,3 +25,9 @@ dist-ssr
 
 .env
 .env.local
+
+
+
+/docs/*
+/SbD_Guides/*
+/testsprite_tests/*

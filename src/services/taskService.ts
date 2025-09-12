@@ -1,7 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const API_KEY = import.meta.env.VITE_API_KEY;
+import api from './api';
 
 export interface Task {
   id: string;
@@ -13,18 +10,11 @@ export interface Task {
   userId: string;
 }
 
-// Configure axios with the API key
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${API_KEY}`
-  }
-});
+
 
 export const fetchTasks = async (userId: string): Promise<Task[]> => {
   try {
-    const response = await api.get(`/tasks`, {
+    const response = await api.get(`/api/tasks`, {
       params: { userId }
     });
     return response.data;
@@ -36,7 +26,7 @@ export const fetchTasks = async (userId: string): Promise<Task[]> => {
 
 export const createTask = async (task: Omit<Task, 'id'>): Promise<Task | null> => {
   try {
-    const response = await api.post(`/tasks`, task);
+    const response = await api.post(`/api/tasks`, task);
     return response.data;
   } catch (error) {
     console.error('Error creating task:', error);
@@ -46,7 +36,7 @@ export const createTask = async (task: Omit<Task, 'id'>): Promise<Task | null> =
 
 export const updateTask = async (taskId: string, updates: Partial<Task>): Promise<Task | null> => {
   try {
-    const response = await api.put(`/tasks/${taskId}`, updates);
+    const response = await api.put(`/api/tasks/${taskId}`, updates);
     return response.data;
   } catch (error) {
     console.error('Error updating task:', error);
@@ -56,7 +46,7 @@ export const updateTask = async (taskId: string, updates: Partial<Task>): Promis
 
 export const deleteTask = async (taskId: string): Promise<boolean> => {
   try {
-    await api.delete(`/tasks/${taskId}`);
+    await api.delete(`/api/tasks/${taskId}`);
     return true;
   } catch (error) {
     console.error('Error deleting task:', error);
@@ -67,7 +57,7 @@ export const deleteTask = async (taskId: string): Promise<boolean> => {
 // Get tasks by priority
 export const fetchTasksByPriority = async (userId: string, priority: string): Promise<Task[]> => {
   try {
-    const response = await api.get(`/tasks`, {
+    const response = await api.get(`/api/tasks`, {
       params: { userId, priority }
     });
     return response.data;
@@ -85,7 +75,7 @@ export const fetchTaskStats = async (userId: string): Promise<{
   overdueCount: number;
 }> => {
   try {
-    const response = await api.get(`/tasks/stats`, {
+    const response = await api.get(`/api/tasks/stats`, {
       params: { userId }
     });
     return response.data;

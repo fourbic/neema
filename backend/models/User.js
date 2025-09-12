@@ -34,6 +34,16 @@ const UserSchema = new Schema({
     }
     // Add other user preferences here
   },
+  // Safety-related fields
+  safetyProfile: {
+    type: Schema.Types.ObjectId,
+    ref: 'SafetyProfile'
+  },
+  safetySettings: {
+    emergencyMode: { type: Boolean, default: false },
+    lastSafetyCheck: { type: Date, default: Date.now },
+    safetyScore: { type: Number, min: 0, max: 10, default: 5 }
+  },
   // Store integration tokens and status directly here
   integrations: {
     google: {

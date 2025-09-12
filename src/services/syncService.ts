@@ -1,7 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-const API_KEY = import.meta.env.VITE_API_KEY;
+import api from './api';
 
 export interface SyncStatus {
   lastSynced: Date | null;
@@ -24,14 +21,7 @@ let syncStatus: SyncStatus = {
   devices: []
 };
 
-// Configure axios with the API key
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${API_KEY}`
-  }
-});
+
 
 export const getSyncStatus = (): SyncStatus => {
   return { ...syncStatus };
